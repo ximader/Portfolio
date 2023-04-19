@@ -33,9 +33,9 @@ DETECTOR_PROTOTXT_LOCAL_PATH = HERE / "./models/opencv_face_detector.pbtxt"
 AGE_MODEL_URL = "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/age_from_face_model.tflite"
 AGE_MODEL_LOCAL_PATH = HERE / "./models/age_from_face_model.tflite"
 
-download_file(DETECTOR_MODEL_URL, DETECTOR_MODEL_LOCAL_PATH, expected_size=2727750)
-download_file(DETECTOR_PROTOTXT_URL, DETECTOR_PROTOTXT_LOCAL_PATH, expected_size=37272)
-download_file(AGE_MODEL_URL, AGE_MODEL_LOCAL_PATH, expected_size=23935320)
+#download_file(DETECTOR_MODEL_URL, DETECTOR_MODEL_LOCAL_PATH, expected_size=2727750)
+#download_file(DETECTOR_PROTOTXT_URL, DETECTOR_PROTOTXT_LOCAL_PATH, expected_size=37272)
+#download_file(AGE_MODEL_URL, AGE_MODEL_LOCAL_PATH, expected_size=23935320)
 
 
 # ===================================================================
@@ -44,12 +44,13 @@ download_file(AGE_MODEL_URL, AGE_MODEL_LOCAL_PATH, expected_size=23935320)
 
 
 # face detection model
-faceNet = cv2.dnn.readNet(
-    str(DETECTOR_MODEL_LOCAL_PATH), str(DETECTOR_PROTOTXT_LOCAL_PATH)
-)
+faceNet = cv2.dnn.readNet(DETECTOR_MODEL_URL, DETECTOR_PROTOTXT_URL)
+#faceNet = cv2.dnn.readNet(
+#    str(DETECTOR_MODEL_LOCAL_PATH), str(DETECTOR_PROTOTXT_LOCAL_PATH)
+#)
 
 # age prediction model
-age_model_lite = tf.lite.Interpreter(model_path=str(AGE_MODEL_LOCAL_PATH))
+age_model_lite = tf.lite.Interpreter(model_path=AGE_MODEL_URL) # str(AGE_MODEL_LOCAL_PATH))
 age_model_lite.allocate_tensors()
 
 global_object_counter = 0
