@@ -379,7 +379,7 @@ def video_frame_callback(frame_: av.VideoFrame) -> av.VideoFrame:
     # set up variables
     global global_frame_counter
     frame = frame_.to_ndarray(format="bgr24")
-    refreshDetection = 1  # number of frames to next face detection
+    '''refreshDetection = 1  # number of frames to next face detection
     conf_threshold = 0.5  # threshold of face detection algorithm
     squared = True  # use squared face boxes
     margin = 1.5  # faceBox margin multiplier
@@ -431,7 +431,7 @@ def video_frame_callback(frame_: av.VideoFrame) -> av.VideoFrame:
             face.set_age(int(preds[i]))
 
     # highlight faces on frame image
-    frame = HighlightFaces(frame, faceObjects)
+    frame = HighlightFaces(frame, faceObjects)'''
 
     return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
