@@ -6,6 +6,7 @@ Created on Sun Apr 16 12:51:15 2023
 @author: root
 
 """
+import os, urllib
 from pathlib import Path
 import av
 import numpy as np
