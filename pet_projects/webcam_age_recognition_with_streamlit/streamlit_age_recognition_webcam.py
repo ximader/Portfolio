@@ -6,8 +6,8 @@ Created on Sun Apr 16 12:51:15 2023
 @author: root
 
 """
-import os, urllib
-from pathlib import Path
+import os 
+import urllib
 import av
 import numpy as np
 import pandas as pd
@@ -15,12 +15,6 @@ import cv2
 import tensorflow as tf
 import streamlit as st
 from streamlit_webrtc import WebRtcMode, webrtc_streamer
-from sample_utils.download import download_file
-
-
-# ===================================================================
-# download models
-# ===================================================================
 
 # External files to download.
 EXTERNAL_DEPENDENCIES = {
@@ -37,6 +31,33 @@ EXTERNAL_DEPENDENCIES = {
         "size": 23935320
     }
 }
+
+# ===================================================================
+# main
+# ===================================================================
+
+
+def main():
+
+    # Download external dependencies.
+    for filename in EXTERNAL_DEPENDENCIES.keys():
+        download_file(filename)
+    
+    st.title("Age Detection by Face")
+
+    webrtc_ctx = webrtc_streamer(
+        key="age-detection",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={"iceServers": [{'urls': ['stun:stun1.l.google.com:19302']}]},
+        video_frame_callback=video_frame_callback,
+        media_stream_constraints={"video": True, "audio": False},
+        async_processing=True,
+    )
+
+# ===================================================================
+# download models
+# ===================================================================
+
 
 # This file downloader demonstrates Streamlit animation.
 # Used a code from https://github.com/streamlit/demo-self-driving/blob/master/streamlit_app.py
@@ -78,10 +99,7 @@ def download_file(file_path):
         if progress_bar is not None:
             progress_bar.empty()
 
-# Download external dependencies.
-for filename in EXTERNAL_DEPENDENCIES.keys():
-    download_file(filename)
-    
+
     
 # ===================================================================
 # import models
@@ -370,7 +388,7 @@ def UpdateObjects(faceObjects=[], faceBoxes=[]):
 
 
 # ===================================================================
-# main
+# frame callback
 # ===================================================================
 
 
@@ -379,7 +397,7 @@ def video_frame_callback(frame_: av.VideoFrame) -> av.VideoFrame:
     # set up variables
     global global_frame_counter
     frame = frame_.to_ndarray(format="bgr24")
-    '''refreshDetection = 1  # number of frames to next face detection
+    refreshDetection = 1  # number of frames to next face detection
     conf_threshold = 0.5  # threshold of face detection algorithm
     squared = True  # use squared face boxes
     margin = 1.5  # faceBox margin multiplier
@@ -431,22 +449,10 @@ def video_frame_callback(frame_: av.VideoFrame) -> av.VideoFrame:
             face.set_age(int(preds[i]))
 
     # highlight faces on frame image
-    frame = HighlightFaces(frame, faceObjects)'''
+    frame = HighlightFaces(frame, faceObjects)
 
     return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 
-        
-st.title("Age Detection by Face")
-
-webrtc_ctx = webrtc_streamer(
-    key="age-detection",
-    mode=WebRtcMode.SENDRECV,
-    rtc_configuration={"iceServers": [{'urls': ['stun:stun.l.google.com:19302']},
-                                      {'url': 'turn:numb.viagenie.ca',
-                                       'credential': 'muazkh',
-                                       'username': 'webrtc@live.com'}]},
-    video_frame_callback=video_frame_callback,
-    media_stream_constraints={"video": True, "audio": False},
-    async_processing=True,
-)
+if __name__ == "__main__":
+    main()     
