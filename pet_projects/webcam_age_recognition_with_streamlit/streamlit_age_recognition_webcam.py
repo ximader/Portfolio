@@ -6,8 +6,7 @@ Created on Sun Apr 16 12:51:15 2023
 @author: root
 
 """
-import os 
-import urllib
+import os, urllib
 import av
 import numpy as np
 import pandas as pd
@@ -32,16 +31,33 @@ EXTERNAL_DEPENDENCIES = {
     }
 }
 
-# ===================================================================
-# main
-# ===================================================================
 
+# GLOBALS 
+faceModel = None
+ageModel = None
+faceCounter = 0
+frameCounter = -1
+faceObjects = []
 
+# Streamlit encourages well-structured code, like starting execution in a main() function.
 def main():
-
+    
+    global faceModel
+    global ageModel
+    
     # Download external dependencies.
     for filename in EXTERNAL_DEPENDENCIES.keys():
         download_file(filename)
+    
+    # face detection model
+    faceModel = cv2.dnn.readNet('opencv_face_detector_uint8.pb', 'opencv_face_detector.pbtxt')
+
+    # age prediction model
+    ageModel = tf.lite.Interpreter(model_path='age_from_face_model.tflite')  
+    ageModel.allocate_tensors()
+
+
+    
     
     st.title("Age Detection by Face")
 
@@ -54,9 +70,11 @@ def main():
         async_processing=True,
     )
 
+
 # ===================================================================
 # download models
 # ===================================================================
+
 
 
 # This file downloader demonstrates Streamlit animation.
@@ -99,25 +117,7 @@ def download_file(file_path):
         if progress_bar is not None:
             progress_bar.empty()
 
-
-    
-# ===================================================================
-# import models
-# ===================================================================
-
-
-# face detection model
-faceNet = cv2.dnn.readNet('opencv_face_detector_uint8.pb', 'opencv_face_detector.pbtxt')
-
-# age prediction model
-age_model_lite = tf.lite.Interpreter(model_path='age_from_face_model.tflite')  
-age_model_lite.allocate_tensors()
-
-global_object_counter = 0
-global_frame_counter = -1
-faceObjects = []
-
-
+ 
 # ===================================================================
 # find all faces in image
 # ===================================================================
@@ -293,7 +293,8 @@ class FaceObject:
 
 def UpdateObjects(faceObjects=[], faceBoxes=[]):
 
-    global global_object_counter
+    global faceCounter
+    global frameCounter
 
     # get pairs of known and detected faces by center coordinates
     def get_pairs(list1, list2):
@@ -368,20 +369,20 @@ def UpdateObjects(faceObjects=[], faceBoxes=[]):
         # mark faces as lost
         if i not in matched_object_ids and not faceObjects[i].is_lost:
             faceObjects[i].is_lost = True
-            faceObjects[i].lost_frame = global_frame_counter
+            faceObjects[i].lost_frame = frameCounter
 
         # delete obsolete faces
         if (
             faceObjects[i].is_lost
-            and (global_frame_counter - faceObjects[i].lost_frame) > 20
+            and (frameCounter - faceObjects[i].lost_frame) > 20
         ):
             del faceObjects[i]
 
     # create of new detected faces
     for i in range(len(faceBoxes)):
         if i not in matched_rect_ids:
-            new = FaceObject(global_object_counter, faceBoxes[i], 0)
-            global_object_counter += 1
+            new = FaceObject(faceCounter, faceBoxes[i], 0)
+            faceCounter += 1
             faceObjects.append(new)
 
     return faceObjects
@@ -395,7 +396,10 @@ def UpdateObjects(faceObjects=[], faceBoxes=[]):
 def video_frame_callback(frame_: av.VideoFrame) -> av.VideoFrame:
 
     # set up variables
-    global global_frame_counter
+    global frameCounter
+    global faceModel
+    global ageModel
+    
     frame = frame_.to_ndarray(format="bgr24")
     refreshDetection = 1  # number of frames to next face detection
     conf_threshold = 0.5  # threshold of face detection algorithm
@@ -404,12 +408,12 @@ def video_frame_callback(frame_: av.VideoFrame) -> av.VideoFrame:
     refreshAge = 10  # number of frames to next age prediction
 
     # count this frame
-    global_frame_counter += 1
+    frameCounter += 1
 
     # detect faces
-    if global_frame_counter % refreshDetection == 0:
+    if frameCounter % refreshDetection == 0:
         faceBoxes = DetectFaces(
-            faceNet,
+            faceModel,
             frame,
             conf_threshold=conf_threshold,
             fit_square=squared,
@@ -419,7 +423,7 @@ def video_frame_callback(frame_: av.VideoFrame) -> av.VideoFrame:
         UpdateObjects(faceObjects, faceBoxes)
 
     # predict age
-    if len(faceObjects) > 0 and global_frame_counter % refreshAge == 0:
+    if len(faceObjects) > 0 and frameCounter % refreshAge == 0:
 
         # get face boxes in correct order
         faceBoxes = []
@@ -437,12 +441,12 @@ def video_frame_callback(frame_: av.VideoFrame) -> av.VideoFrame:
 
         # get predictions from tflite model
         preds = []
-        input_details = age_model_lite.get_input_details()
-        output_details = age_model_lite.get_output_details()
+        input_details = ageModel.get_input_details()
+        output_details = ageModel.get_output_details()
         for img in predImages_rgb:
-            age_model_lite.set_tensor(input_details[0]["index"], [img])
-            age_model_lite.invoke()
-            preds.append(age_model_lite.get_tensor(output_details[0]["index"]))
+            ageModel.set_tensor(input_details[0]["index"], [img])
+            ageModel.invoke()
+            preds.append(ageModel.get_tensor(output_details[0]["index"]))
 
         # put predicted age to faceObjects
         for i, face in enumerate(faceObjects):
