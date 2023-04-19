@@ -24,13 +24,13 @@ from sample_utils.download import download_file
 
 HERE = Path(__file__).parent
 
-DETECTOR_MODEL_URL = "file:opencv_face_detector_uint8.pb"
+DETECTOR_MODEL_URL = "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/opencv_face_detector_uint8.pb"
 DETECTOR_MODEL_LOCAL_PATH = HERE / "./models/opencv_face_detector_uint8.pb"
 
-DETECTOR_PROTOTXT_URL = "file:opencv_face_detector.pbtxt"
+DETECTOR_PROTOTXT_URL = "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/opencv_face_detector.pbtxt"
 DETECTOR_PROTOTXT_LOCAL_PATH = HERE / "./models/opencv_face_detector.pbtxt"
 
-AGE_MODEL_URL = "file:age_from_face_model.tflite"
+AGE_MODEL_URL = "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/age_from_face_model.tflite"
 AGE_MODEL_LOCAL_PATH = HERE / "./models/age_from_face_model.tflite"
 
 download_file(DETECTOR_MODEL_URL, DETECTOR_MODEL_LOCAL_PATH)
