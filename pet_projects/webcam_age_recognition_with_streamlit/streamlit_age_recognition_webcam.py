@@ -33,9 +33,9 @@ DETECTOR_PROTOTXT_LOCAL_PATH = HERE / "./models/opencv_face_detector.pbtxt"
 AGE_MODEL_URL = "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/age_from_face_model.tflite"
 AGE_MODEL_LOCAL_PATH = HERE / "./models/age_from_face_model.tflite"
 
-download_file(DETECTOR_MODEL_URL, DETECTOR_MODEL_LOCAL_PATH)
-download_file(DETECTOR_PROTOTXT_URL, DETECTOR_PROTOTXT_LOCAL_PATH)
-download_file(AGE_MODEL_URL, AGE_MODEL_LOCAL_PATH)
+download_file(DETECTOR_MODEL_URL, DETECTOR_MODEL_LOCAL_PATH, expected_size=2727750)
+download_file(DETECTOR_PROTOTXT_URL, DETECTOR_PROTOTXT_LOCAL_PATH, expected_size=37272)
+download_file(AGE_MODEL_URL, AGE_MODEL_LOCAL_PATH, expected_size=23935320)
 
 
 # ===================================================================
