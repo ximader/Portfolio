@@ -2,7 +2,7 @@
 
 This project uses [pre-trained](https://github.com/ximader/Portfolio/tree/main/yandex.practicum/ds_19_image_recognition) TensorFlow model to predict person's age by webcam video stream.
 
-
+![Preview](preview.png)
 
 ## Libraries used:
 - OpenCV
