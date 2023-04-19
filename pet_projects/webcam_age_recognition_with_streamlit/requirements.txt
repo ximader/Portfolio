@@ -1,0 +1,7 @@
+av==10.0.0
+numpy==1.23.2
+pandas==1.5.3
+tensorflow==2.10.0
+opencv-python-headless==4.7.0
+streamlit==2.10.0
+streamlit_webrtc==2.10.0
