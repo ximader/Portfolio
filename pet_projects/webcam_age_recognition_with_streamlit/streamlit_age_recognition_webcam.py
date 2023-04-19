@@ -3,10 +3,14 @@
 """
 Created on Sun Apr 16 12:51:15 2023
 
-@author: root
+@author:    Alexander Lomakin
+@credits:   Yuichiro Tachibana (https://github.com/whitphx/streamlit-webrtc-example)
+            Randy Zwitch (https://github.com/streamlit/demo-self-driving)
 
 """
-import os, urllib
+
+import os
+import urllib
 import av
 import numpy as np
 import pandas as pd
@@ -39,7 +43,12 @@ faceCounter = 0
 frameCounter = -1
 faceObjects = []
 
-# Streamlit encourages well-structured code, like starting execution in a main() function.
+
+# ===================================================================
+# main
+# ===================================================================
+
+
 def main():
     
     global faceModel
@@ -55,14 +64,11 @@ def main():
     # age prediction model
     ageModel = tf.lite.Interpreter(model_path='age_from_face_model.tflite')  
     ageModel.allocate_tensors()
-
-
-    
-    
-    st.title("Age Detection by Face")
+ 
+    st.title("Age Recognition Webcam")
 
     webrtc_ctx = webrtc_streamer(
-        key="age-detection",
+        key="age-recognition-webcam",
         mode=WebRtcMode.SENDRECV,
         rtc_configuration={"iceServers": [{'urls': ['stun:stun1.l.google.com:19302']}]},
         video_frame_callback=video_frame_callback,
@@ -74,7 +80,6 @@ def main():
 # ===================================================================
 # download models
 # ===================================================================
-
 
 
 # This file downloader demonstrates Streamlit animation.
