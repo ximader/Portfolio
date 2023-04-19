@@ -3,4 +3,4 @@ streamlit==1.21.0
 streamlit_webrtc==0.45.0
 numpy==1.23.2
 pandas==1.5.3
-tensorflow==2.10.0
+tensorflow-cpu
