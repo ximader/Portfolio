@@ -25,20 +25,22 @@ from sample_utils.download import download_file
 # External files to download.
 EXTERNAL_DEPENDENCIES = {
     "opencv_face_detector_uint8.pb": {
-        "url": "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/opencv_face_detector_uint8.pb",
+        "url": "https://github.com/ximader/Portfolio/raw/main/pet_projects/webcam_age_recognition_with_streamlit/opencv_face_detector_uint8.pb",
         "size": 2727750
     },
     "opencv_face_detector.pbtxt": {
-        "url": "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/opencv_face_detector.pbtxt",
+        "url": "https://github.com/ximader/Portfolio/raw/main/pet_projects/webcam_age_recognition_with_streamlit/opencv_face_detector.pbtxt",
         "size": 37272
     },
     "age_from_face_model.tflite": {
-        "url": "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/age_from_face_model.tflite",
+        "url": "https://github.com/ximader/Portfolio/raw/main/pet_projects/webcam_age_recognition_with_streamlit/age_from_face_model.tflite",
         "size": 23935320
     }
 }
 
 # This file downloader demonstrates Streamlit animation.
+# Used a code from https://github.com/streamlit/demo-self-driving/blob/master/streamlit_app.py
+#
 def download_file(file_path):
     # Don't download the file twice. (If possible, verify the download using the file length.)
     if os.path.exists(file_path):
