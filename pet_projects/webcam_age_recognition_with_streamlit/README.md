@@ -14,6 +14,10 @@ This project uses [pre-trained](https://github.com/ximader/Portfolio/tree/main/y
 - Numpy
 - Pandas
 
+## Hosted on Streamlit Cloud: 
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://age-recognition-webcam.streamlit.app/) https://age-recognition-webcam.streamlit.app/
+
 ## To run this demo locally:
 ```
 conda create -n test_env python=3.9
@@ -22,7 +26,3 @@ pip install --upgrade streamlit opencv-python av tensorflow-macos streamlit_webr
 
 streamlit run https://raw.githubusercontent.com/ximader/Portfolio/main/pet_projects/webcam_age_recognition_with_streamlit/streamlit_age_recognition_webcam.py
 ```
-
-## Hosted on Streamlit Cloud: 
-
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://age-recognition-webcam.streamlit.app/) https://age-recognition-webcam.streamlit.app/
