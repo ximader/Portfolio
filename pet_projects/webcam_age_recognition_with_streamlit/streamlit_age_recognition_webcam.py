@@ -21,36 +21,75 @@ from sample_utils.download import download_file
 # download models
 # ===================================================================
 
+# External files to download.
+EXTERNAL_DEPENDENCIES = {
+    "opencv_face_detector_uint8.pb": {
+        "url": "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/opencv_face_detector_uint8.pb",
+        "size": 2727750
+    },
+    "opencv_face_detector.pbtxt": {
+        "url": "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/opencv_face_detector.pbtxt",
+        "size": 37272
+    },
+    "age_from_face_model.tflite": {
+        "url": "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/age_from_face_model.tflite",
+        "size": 23935320
+    }
+}
 
-HERE = Path(__file__).parent
+# This file downloader demonstrates Streamlit animation.
+def download_file(file_path):
+    # Don't download the file twice. (If possible, verify the download using the file length.)
+    if os.path.exists(file_path):
+        if "size" not in EXTERNAL_DEPENDENCIES[file_path]:
+            return
+        elif os.path.getsize(file_path) == EXTERNAL_DEPENDENCIES[file_path]["size"]:
+            return
 
-DETECTOR_MODEL_URL = "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/opencv_face_detector_uint8.pb"
-DETECTOR_MODEL_LOCAL_PATH = HERE / "./models/opencv_face_detector_uint8.pb"
+    # These are handles to two visual elements to animate.
+    weights_warning, progress_bar = None, None
+    try:
+        weights_warning = st.warning("Downloading %s..." % file_path)
+        progress_bar = st.progress(0)
+        with open(file_path, "wb") as output_file:
+            with urllib.request.urlopen(EXTERNAL_DEPENDENCIES[file_path]["url"]) as response:
+                length = int(response.info()["Content-Length"])
+                counter = 0.0
+                MEGABYTES = 2.0 ** 20.0
+                while True:
+                    data = response.read(8192)
+                    if not data:
+                        break
+                    counter += len(data)
+                    output_file.write(data)
 
-DETECTOR_PROTOTXT_URL = "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/opencv_face_detector.pbtxt"
-DETECTOR_PROTOTXT_LOCAL_PATH = HERE / "./models/opencv_face_detector.pbtxt"
+                    # We perform animation by overwriting the elements.
+                    weights_warning.warning("Downloading %s... (%6.2f/%6.2f MB)" %
+                        (file_path, counter / MEGABYTES, length / MEGABYTES))
+                    progress_bar.progress(min(counter / length, 1.0))
 
-AGE_MODEL_URL = "https://github.com/ximader/Portfolio/blob/main/pet_projects/webcam_age_recognition_with_streamlit/age_from_face_model.tflite"
-AGE_MODEL_LOCAL_PATH = HERE / "./models/age_from_face_model.tflite"
+    # Finally, we remove these visual elements by calling .empty().
+    finally:
+        if weights_warning is not None:
+            weights_warning.empty()
+        if progress_bar is not None:
+            progress_bar.empty()
 
-#download_file(DETECTOR_MODEL_URL, DETECTOR_MODEL_LOCAL_PATH, expected_size=2727750)
-#download_file(DETECTOR_PROTOTXT_URL, DETECTOR_PROTOTXT_LOCAL_PATH, expected_size=37272)
-#download_file(AGE_MODEL_URL, AGE_MODEL_LOCAL_PATH, expected_size=23935320)
-
-
+# Download external dependencies.
+for filename in EXTERNAL_DEPENDENCIES.keys():
+    download_file(filename)
+    
+    
 # ===================================================================
 # import models
 # ===================================================================
 
 
 # face detection model
-faceNet = cv2.dnn.readNet(DETECTOR_MODEL_URL, DETECTOR_PROTOTXT_URL)
-#faceNet = cv2.dnn.readNet(
-#    str(DETECTOR_MODEL_LOCAL_PATH), str(DETECTOR_PROTOTXT_LOCAL_PATH)
-#)
+faceNet = cv2.dnn.readNet('opencv_face_detector_uint8.pb', 'opencv_face_detector.pbtxt')
 
 # age prediction model
-age_model_lite = tf.lite.Interpreter(model_path=AGE_MODEL_URL) # str(AGE_MODEL_LOCAL_PATH))
+age_model_lite = tf.lite.Interpreter(model_path='age_from_face_model.tflite')  
 age_model_lite.allocate_tensors()
 
 global_object_counter = 0
@@ -394,6 +433,7 @@ def video_frame_callback(frame_: av.VideoFrame) -> av.VideoFrame:
     return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 
+        
 st.title("Age Detection by Face")
 
 webrtc_ctx = webrtc_streamer(
